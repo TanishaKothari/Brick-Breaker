@@ -7,6 +7,20 @@ public class ResetZone : MonoBehaviour
 {
     private void OnTriggerEnter2D(Collider2D other)
     {
-        FindObjectOfType<GameManager>().Miss();
+        if (!(other.gameObject.tag == "SlowBall"))
+        {
+            other.gameObject.SetActive(false);
+        } 
+        else
+        {
+            other.gameObject.SetActive(true);
+        }
+        
+        if (other.gameObject.tag != "Ball")
+        {}
+        else
+        {
+            FindObjectOfType<GameManager>().Miss();
+        }
     }
 }

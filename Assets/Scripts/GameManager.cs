@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
     public Text lifeCount { get; private set; }
     public Button nextLevel;
     public Button replay;
+    public PowerUpSpawner spawner { get; private set; }
 
     const int NUM_LEVELS = 2;
 
@@ -66,8 +67,8 @@ public class GameManager : MonoBehaviour
             paddle = FindObjectOfType<Paddle>();
             bricks = FindObjectsOfType<Brick>();
             lifeCount = FindObjectOfType<Text>();
+            spawner = FindObjectOfType<PowerUpSpawner>();
 
-            ball.speed += 2;
             nextLevel = GameObject.FindGameObjectWithTag("NextLevel").GetComponent<Button>();
             nextLevel.gameObject.SetActive(false);
         }
@@ -75,20 +76,22 @@ public class GameManager : MonoBehaviour
 
     public void Miss()
     {
-        lives--;
-        if (lives == 3) {
-            lifeCount.text = " Lives: 3";
-        } else if (lives == 2) {
-            lifeCount.text = " Lives: 2";
-        } else if (lives == 1) {
-            lifeCount.text = " Lives: 1";
-        } else {
-            lifeCount.text = " Lives: 0";
+        if(ball.ballCount > 0)
+        {
+            ball.ballCount = ball.ballCount - 1;
         }
-
+        if(ball.ballCount == 0)
+        {
+            lives--;
+            paddle.transform.localScale = new Vector3(1f,1f,0);
+            ball.gameObject.SetActive(true);
+        }
+        ball.speed = 10;
         if (lives > 0) {
+            lifeCount.text = $"Lives: {lives}";
             ResetLevel();
-        } else {
+        }
+        else{
             GameOver();
         }
     }
@@ -108,11 +111,14 @@ public class GameManager : MonoBehaviour
     public void Hit(Brick brick)
     {
         score += brick.points;
+        if (!brick.gameObject.activeInHierarchy)
+        {
+            StartCoroutine(spawner.SpawnPowerUpRoutine());
+        }
 
         if (Cleared()) {
             if (level+1 > NUM_LEVELS) {
                 SceneManager.LoadScene(3);
-                //replay.onClick.AddListener(() => SceneManager.LoadScene(0));
             } else {
                 nextLevel.gameObject.SetActive(true);
                 nextLevel.onClick.AddListener(() => LoadLevel(level + 1));

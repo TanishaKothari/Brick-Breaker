@@ -5,7 +5,7 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 public class Ball : MonoBehaviour
 {
-    public static Ball instance;
+    public int ballCount = 1;
     
     public new Rigidbody2D rigidbody { get; private set; }
     public float speed = 10f;
